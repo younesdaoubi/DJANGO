@@ -1,0 +1,75 @@
+{% extends 'Immo/base.html' %}
+
+{% block content %}
+
+<article class="media content-section">
+    <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
+    <!-- affiche limg utilisateur sur larticle blog pour voir la photo de celui qui a poster)-->
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ object.author }}</a>
+            <small class="text-muted">{{ object.date_posted|date:"F d,Y" }}</small>
+            {% if object.author == user %}
+            <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
+                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
+            </div>
+
+            {% endif %}
+        </div>
+        <h2 class="article-title">{{ object.title }}</h2>
+        <p class="article-content">{{ object.content }}</p>
+    </div>
+    <p class="article-content"><strong>{{ object.price }} €</strong></p><br/>
+    <p class="article-content"><strong>{{ object.surface }} m²</strong></p>
+    <div id="favourite-section">
+        {% if is_favourite %}
+        <a href="{% url 'favourite_post' id=post.id %}">
+            <i class="fas fa-star fa-lg"></i> <!-- fa-lg agrandit-->
+        </a>
+        {% else %}
+        <a href="{% url 'favourite_post' id=post.id %}">
+            <i class="far fa-star fa-lg"></i> <!-- fa-lg agrandit-->
+        </a>
+        {% endif %}
+    </div>
+    <!-- LE IF/ENDIF CI DESSOUS DEBUG L ERREUR LORSQUE ON ESSAIE D ACCEDER
+        A UN POST DONT IL N Y A PAS D IMAGE AYANT ETE CREER AVANT LA MIGRATION DE IMAGE.-->
+
+    {% if post.image %}
+    <img src="{{post.image.url }}" width="150" height="150" style="border-radius: 8px;">
+    {% endif %}
+
+</article>
+
+
+<!-- mapbox body -->
+<div id='map' style='width: 400px; height: 300px;'></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoieW91bmVzMngxOTk5IiwiYSI6ImNreDloMXNsdDA3ajYyb213OGd6NWZzNTgifQ.BJWq3YKGRvd0iaZaofY_7Q';
+var map = new mapboxgl.Map({
+    container: 'map', // container ID
+    style: 'mapbox://styles/mapbox/streets-v11', // style URL
+    center: [{{object.situation.longitude}}, {{object.situation.latitude }}], // starting position [lng, lat]
+    zoom: 12 // starting zoom
+});
+
+
+
+// creation d'un marker MAPBOX
+
+const marker = new mapboxgl.Marker() // initialize a new marker
+  //.setLngLat([-122.25948, 37.87221]) // Marker [lng, lat] coordinates
+  .setLngLat([{{object.situation.longitude}}, {{object.situation.latitude }}]) // Marker [lng, lat] coordinates
+  .addTo(map); // Add the marker to the map
+
+
+
+
+
+
+</script>
+
+
+{% endblock content %}
